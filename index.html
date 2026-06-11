@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPAM – Sistema de Pré Atendimento Médico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --p50: #EEEDFE; --p100: #CECBF6; --p200: #AFA9EC;
+    --p400: #7F77DD; --p600: #534AB7; --p800: #3C3489; --p900: #26215C;
+    --bg: #f0eeff;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 40px;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .header-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .header-icon {
+    width: 42px; height: 42px;
+    background: var(--p600);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .header-icon i { color: #fff; font-size: 22px; }
+  .header h1 { font-size: 22px; font-weight: 600; color: var(--p900); }
+  .header p { font-size: 12px; color: var(--p400); margin-top: 2px; }
+
+  /* ── Nav pills ── */
+  .nav {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    justify-content: center;
+    margin-bottom: 24px;
+    max-width: 560px;
+  }
+  .nav button {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid #c8c2f0;
+    background: #fff;
+    color: var(--p800);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .nav button:hover { border-color: var(--p600); color: var(--p600); }
+  .nav button.active { background: var(--p600); color: #fff; border-color: var(--p600); }
+
+  /* ── Screen label ── */
+  .screen-label {
+    font-size: 10px; font-weight: 500;
+    color: var(--p400);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    margin-bottom: 10px;
+  }
+
+  /* ── Phone shell ── */
+  .phone-wrap { display: flex; justify-content: center; }
+  .phone {
+    width: 280px;
+    background: #fff;
+    border-radius: 44px;
+    border: 9px solid #1a1a2e;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(83,74,183,.22), 0 4px 12px rgba(0,0,0,.12);
+  }
+  .dynamic-island {
+    width: 90px; height: 26px;
+    background: #1a1a2e;
+    border-radius: 0 0 16px 16px;
+    margin: 0 auto;
+  }
+  .status-bar {
+    display: flex; justify-content: space-between;
+    padding: 5px 18px 2px;
+    font-size: 10px; color: #888;
+  }
+  .status-bar span { display: flex; align-items: center; gap: 4px; }
+  .screen { background: #f7f6ff; }
+
+  /* ── Top bar ── */
+  .topbar {
+    background: #fff;
+    padding: 12px 16px 10px;
+    border-bottom: 1px solid #ede9fb;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .topbar-title { font-size: 14px; font-weight: 600; color: var(--p900); flex: 1; }
+  .back-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%; background: var(--p50);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .back-btn i { color: var(--p600); font-size: 15px; }
+
+  /* ── Content ── */
+  .content { padding: 16px; }
+
+  /* ── Logo block ── */
+  .logo-block { text-align: center; padding: 28px 16px 18px; }
+  .logo-icon {
+    width: 64px; height: 64px;
+    background: var(--p600);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+    box-shadow: 0 8px 20px rgba(83,74,183,.3);
+  }
+  .logo-icon i { color: #fff; font-size: 30px; }
+  .logo-name { font-size: 24px; font-weight: 600; color: var(--p900); letter-spacing: .5px; }
+  .logo-sub { font-size: 10px; color: var(--p400); margin-top: 3px; }
+
+  /* ── Fields ── */
+  .field-group { margin-bottom: 12px; }
+  .field-label { font-size: 10px; font-weight: 500; color: #777; margin-bottom: 4px; padding-left: 2px; }
+  .field-input {
+    background: #fff;
+    border: 1.5px solid #ddd8f8;
+    border-radius: 12px;
+    padding: 10px 13px;
+    font-size: 12px; color: #555;
+    display: flex; align-items: center; gap: 8px;
+    transition: border-color .15s;
+  }
+  .field-input.focused { border-color: var(--p600); }
+  .field-input i { color: var(--p400); font-size: 16px; }
+  .field-input .placeholder { color: #bbb; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    display: block; width: 100%;
+    padding: 12px;
+    background: var(--p600); color: #fff;
+    border-radius: 14px; font-size: 13px; font-weight: 600;
+    text-align: center; border: none;
+    font-family: 'Inter', sans-serif; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(83,74,183,.3);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-secondary {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%; padding: 12px;
+    background: #fff; color: var(--p600);
+    border-radius: 14px; font-size: 13px; font-weight: 600;
+    border: 1.5px solid var(--p600);
+    font-family: 'Inter', sans-serif; cursor: pointer; margin-top: 10px;
+  }
+  .forgot { text-align: right; font-size: 10px; color: var(--p600); margin: -6px 0 10px; }
+  .divider { text-align: center; font-size: 11px; color: #aaa; margin: 12px 0; }
+
+  /* ── Chat ── */
+  .chat-area { background: #f7f6ff; padding: 12px 14px; min-height: 340px; }
+  .bubble-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: flex-end; }
+  .bubble-row.user { justify-content: flex-end; }
+  .av {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--p100);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .av i { color: var(--p600); font-size: 14px; }
+  .bubble {
+    padding: 9px 12px; border-radius: 16px;
+    font-size: 11px; line-height: 1.55; max-width: 80%;
+  }
+  .bubble.ai {
+    background: #fff; border: 1px solid #e8e4fb;
+    color: #333; border-bottom-left-radius: 4px;
+  }
+  .bubble.user {
+    background: var(--p600); color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .typing {
+    display: flex; gap: 4px; align-items: center;
+    padding: 9px 14px;
+    background: #fff; border: 1px solid #e8e4fb;
+    border-radius: 16px; border-bottom-left-radius: 4px;
+    width: 52px;
+  }
+  .dot { width: 6px; height: 6px; background: var(--p400); border-radius: 50%; animation: bounce .9s infinite; }
+  .dot:nth-child(2) { animation-delay: .15s; }
+  .dot:nth-child(3) { animation-delay: .3s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+  .chat-input-bar {
+    background: #fff; border-top: 1px solid #ede9fb;
+    padding: 10px 14px;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .chat-input-field {
+    flex: 1; background: #f7f6ff;
+    border: 1px solid #e8e4fb; border-radius: 22px;
+    padding: 8px 13px; font-size: 11px; color: #aaa;
+  }
+  .send-btn {
+    width: 34px; height: 34px;
+    background: var(--p600); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 8px rgba(83,74,183,.3);
+  }
+  .send-btn i { color: #fff; font-size: 16px; }
+
+  /* ── Triagem ── */
+  .urgency-bar {
+    border-radius: 14px; padding: 12px 14px;
+    display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+    border: 1px solid transparent;
+  }
+  .urgency-bar.yellow { background: #FAEEDA; border-color: #f5d9a8; }
+  .urgency-bar.red    { background: #FCEBEB; border-color: #f5c0c0; }
+  .urgency-bar.green  { background: #EAF3DE; border-color: #c5e0a8; }
+  .urg-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .urg-dot.yellow { background: #E09900; }
+  .urg-dot.red    { background: #E24B4A; }
+  .urg-dot.green  { background: #3B6D11; }
+  .urg-text-title { font-size: 12px; font-weight: 600; }
+  .urg-text-title.yellow { color: #854F0B; }
+  .urg-text-title.red    { color: #A32D2D; }
+  .urg-text-title.green  { color: #3B6D11; }
+  .urg-text-sub { font-size: 10px; color: #999; margin-top: 1px; }
+
+  .card {
+    background: #fff; border-radius: 14px;
+    border: 1px solid #ede9fb; padding: 12px 14px; margin-bottom: 10px;
+  }
+  .card-title { font-size: 12px; font-weight: 600; color: var(--p900); margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+  .card-title i { color: var(--p600); font-size: 15px; }
+  .card-body { font-size: 11px; color: #555; line-height: 1.6; }
+
+  .section-label { font-size: 11px; font-weight: 600; color: var(--p900); margin: 4px 0 8px; }
+  .rec-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 12px; background: #fff;
+    border-radius: 10px; border: 1px solid #ede9fb; margin-bottom: 6px;
+  }
+  .rec-item i { color: var(--p600); font-size: 15px; }
+  .rec-item span { font-size: 11px; color: #444; }
+
+  /* ── Hospitais ── */
+  .mini-map {
+    background: linear-gradient(135deg, #ddd8f8 0%, #eeeaff 100%);
+    border-radius: 14px; height: 76px; margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid #ccc8f0; position: relative; overflow: hidden;
+  }
+  .mini-map::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(83,74,183,.06) 18px, rgba(83,74,183,.06) 19px),
+                      repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(83,74,183,.06) 18px, rgba(83,74,183,.06) 19px);
+  }
+  .mini-map i { color: var(--p600); font-size: 30px; position: relative; }
+
+  .hosp-card {
+    background: #fff; border-radius: 14px;
+    border: 1px solid #ede9fb; padding: 11px 13px;
+    margin-bottom: 8px; display: flex; gap: 10px; align-items: center;
+  }
+  .hosp-icon {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: var(--p50); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .hosp-icon i { color: var(--p600); font-size: 20px; }
+  .hosp-info { flex: 1; }
+  .hosp-name { font-size: 12px; font-weight: 600; color: var(--p900); }
+  .hosp-meta { font-size: 10px; color: #888; margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .hosp-meta span { display: flex; align-items: center; gap: 3px; }
+  .stars { color: #FAC775; }
+  .sel-btn {
+    font-size: 10px; padding: 6px 11px;
+    border-radius: 20px; background: var(--p600); color: #fff;
+    border: none; font-family: 'Inter', sans-serif;
+    cursor: pointer; font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ── Agendamento ── */
+  .cal-card {
+    background: #fff; border-radius: 14px;
+    border: 1px solid #ede9fb; padding: 14px; margin-bottom: 12px;
+  }
+  .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .cal-month { font-size: 12px; font-weight: 600; color: var(--p900); }
+  .cal-nav i { color: var(--p600); font-size: 16px; cursor: pointer; }
+  .cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 1px; margin-bottom: 6px; }
+  .cal-day-lbl { text-align: center; font-size: 9px; font-weight: 600; color: #bbb; }
+  .cal-dates { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+  .cal-date {
+    text-align: center; font-size: 10px; padding: 5px 0;
+    color: #555; border-radius: 7px; cursor: pointer;
+    transition: background .1s;
+  }
+  .cal-date:hover:not(.today):not(.selected):not(.unavail) { background: var(--p50); }
+  .cal-date.today {
+    background: var(--p100); color: var(--p900); font-weight: 600;
+    border-radius: 50%; width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center; margin: auto;
+  }
+  .cal-date.selected {
+    background: var(--p600); color: #fff; font-weight: 600;
+    border-radius: 50%; width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center; margin: auto;
+  }
+  .cal-date.unavail { color: #ddd; cursor: default; }
+
+  .time-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .time-chip {
+    padding: 6px 12px; border-radius: 22px;
+    border: 1.5px solid #ddd8f8; font-size: 10px; font-weight: 500;
+    color: #555; background: #fff; cursor: pointer; transition: all .15s;
+  }
+  .time-chip:hover:not(.unavail) { border-color: var(--p600); color: var(--p600); }
+  .time-chip.selected { background: var(--p600); color: #fff; border-color: var(--p600); }
+  .time-chip.unavail { color: #ccc; border-color: #eee; cursor: default; }
+
+  /* ── Emergência ── */
+  .emg-header { background: var(--p600); padding: 16px 16px 14px; }
+  .emg-alert-icon {
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,.18); border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 10px;
+  }
+  .emg-alert-icon i { color: #fff; font-size: 24px; }
+  .emg-title { font-size: 16px; font-weight: 600; color: #fff; }
+  .emg-sub { font-size: 11px; color: rgba(255,255,255,.75); margin-top: 3px; }
+  .emg-content { padding: 14px 16px; }
+  .emg-hosp { background: #fff; border-radius: 14px; border: 1px solid #ede9fb; padding: 12px 14px; margin-bottom: 12px; }
+  .emg-hosp-label { font-size: 10px; color: #999; margin-bottom: 4px; }
+  .emg-hosp-name { font-size: 14px; font-weight: 600; color: var(--p900); }
+  .emg-hosp-meta { font-size: 11px; color: #888; margin-top: 5px; display: flex; gap: 14px; }
+  .emg-hosp-meta span { display: flex; align-items: center; gap: 4px; }
+  .symptom-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--p50); border-radius: 22px;
+    padding: 5px 11px; font-size: 10px; font-weight: 500; color: var(--p800);
+    margin: 0 4px 5px 0;
+  }
+  .symptom-chip i { font-size: 12px; color: var(--p600); }
+  .btn-emg-primary {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    width: 100%; padding: 12px;
+    background: var(--p600); color: #fff;
+    border-radius: 14px; font-size: 13px; font-weight: 600;
+    border: none; font-family: 'Inter', sans-serif; cursor: pointer;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 14px rgba(83,74,183,.3);
+  }
+  .btn-emg-secondary {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    width: 100%; padding: 12px;
+    background: #fff; color: var(--p600);
+    border-radius: 14px; font-size: 13px; font-weight: 600;
+    border: 1.5px solid var(--p600); font-family: 'Inter', sans-serif; cursor: pointer;
+  }
+
+  .home-bar { height: 4px; width: 80px; background: #ddd; border-radius: 2px; margin: 8px auto; }
+
+  /* ── Stage control ── */
+  .stage { display: none; }
+  .stage.show { display: block; }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 28px; text-align: center;
+    font-size: 11px; color: #aaa;
+    line-height: 1.7;
+  }
+  .footer strong { color: var(--p600); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">
+    <div class="header-icon"><i class="ti ti-stethoscope"></i></div>
+    <h1>SPAM</h1>
+  </div>
+  <p>Sistema de Pré Atendimento Médico &nbsp;·&nbsp; Protótipo de Alta Fidelidade</p>
+</div>
+
+<nav class="nav" id="nav">
+  <button class="active" onclick="show(0)">1 · Login</button>
+  <button onclick="show(1)">2 · Saúde</button>
+  <button onclick="show(2)">3 · Chat IA</button>
+  <button onclick="show(3)">4 · Triagem</button>
+  <button onclick="show(4)">5 · Hospitais</button>
+  <button onclick="show(5)">6 · Agenda</button>
+  <button onclick="show(6)">7 · Emergência</button>
+</nav>
+
+<!-- ═══════════════════════════ TELA 1 — LOGIN ═══════════════════════════ -->
+<div class="stage show" id="s0">
+  <p class="screen-label">Tela 1 — Login / Cadastro</p>
+  <div class="phone-wrap"><div class="phone">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span>9:41</span>
+      <span><i class="ti ti-wifi"></i><i class="ti ti-battery-2"></i></span>
+    </div>
+    <div class="screen">
+      <div class="logo-block">
+        <div class="logo-icon"><i class="ti ti-stethoscope"></i></div>
+        <div class="logo-name">SPAM</div>
+        <div class="logo-sub">Sistema de Pré Atendimento Médico</div>
+      </div>
+      <div class="content" style="padding-top:0">
+        <div class="field-group">
+          <div class="field-label">E-mail</div>
+          <div class="field-input focused">
+            <i class="ti ti-mail"></i>
+            <span>seu@email.com</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Senha</div>
+          <div class="field-input">
+            <i class="ti ti-lock"></i>
+            <span class="placeholder">••••••••</span>
+          </div>
+        </div>
+        <div class="forgot">Esqueci minha senha</div>
+        <button class="btn-primary"><i class="ti ti-login"></i> Entrar</button>
+        <div class="divider">ou</div>
+        <button class="btn-secondary"><i class="ti ti-user-plus"></i> Cadastre-se</button>
+      </div>
+    </div>
+    <div class="home-bar"></div>
+  </div></div>
+</div>
+
+<!-- ═══════════════════════════ TELA 2 — SAÚDE ═══════════════════════════ -->
+<div class="stage" id="s1">
+  <p class="screen-label">Tela 2 — Cadastro de Saúde</p>
+  <div class="phone-wrap"><div class="phone">
+    <div class="dynamic-island"></div>
+    <div class="status-bar"><span>9:41</span><span><i class="ti ti-wifi"></i></span></div>
+    <div class="screen">
+      <div class="topbar">
+        <div class="back-btn"><i class="ti ti-arrow-left"></i></div>
+        <span class="topbar-title">Perfil de saúde</span>
+        <i class="ti ti-heart-rate-monitor" style="font-size:18px;color:var(--p400)"></i>
+      </div>
+      <div class="content">
+        <div class="field-group">
+          <div class="field-label">Nome completo</div>
+          <div class="field-input focused"><i class="ti ti-user"></i><span>João Silva</span></div>
+        </div>
+        <div class="grid3">
+          <div>
+            <div class="field-label">Idade</div>
+            <div class="field-input" style="padding:9px 10px"><span style="font-size:11px">34 anos</span></div>
+          </div>
+          <div>
+            <div class="field-label">Altura</div>
+            <div class="field-input" style="padding:9px 10px"><span style="font-size:11px">1,75 m</span></div>
+          </div>
+          <div>
+            <div class="field-label">Peso</div>
+            <div class="field-input" style="padding:9px 10px"><span style="font-size:11px">78 kg</span></div>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label"><i class="ti ti-activity" style="font-size:11px;margin-right:3px"></i>Doenças crônicas</div>
+          <div class="field-input"><span class="placeholder">Ex: diabetes, hipertensão...</span></div>
+        </div>
+        <div class="field-group">
+          <div class="field-label"><i class="ti ti-pill" style="font-size:11px;margin-right:3px"></i>Medicamentos contínuos</div>
+          <div class="field-input"><span class="placeholder">Ex: metformina 500mg...</span></div>
+        </div>
+        <div class="field-group">
+          <div class="field-label"><i class="ti ti-alert-circle" style="font-size:11px;margin-right:3px"></i>Alergias</div>
+          <div class="field-input"><span class="placeholder">Ex: penicilina, dipirona...</span></div>
+        </div>
+        <button class="btn-primary" style="margin-top:4px"><i class="ti ti-device-floppy"></i> Salvar informações</button>
+      </div>
+    </div>
+    <div class="home-bar"></div>
+  </div></div>
+</div>
+
+<!-- ═══════════════════════════ TELA 3 — CHAT IA ═══════════════════════════ -->
+<div class="stage" id="s2">
+  <p class="screen-label">Tela 3 — Chat com IA</p>
+  <div class="phone-wrap"><div class="phone">
+    <div class="dynamic-island"></div>
+    <div class="status-bar"><span>9:41</span><span><i class="ti ti-wifi"></i></span></div>
+    <div class="screen" style="display:flex;flex-direction:column">
+      <div class="topbar">
+        <div class="back-btn"><i class="ti ti-arrow-left"></i></div>
+        <span class="topbar-title">Assistente SPAM</span>
+        <span style="font-size:10px;background:#EAF3DE;color:#3B6D11;padding:3px 9px;border-radius:20px;font-weight:600">online</span>
+      </div>
+      <div class="chat-area" style="flex:1">
+        <div class="bubble-row">
+          <div class="av"><i class="ti ti-robot"></i></div>
+          <div class="bubble ai">Olá! Sou o assistente do SPAM. Descreva seus sintomas para iniciarmos a triagem.</div>
+        </div>
+        <div class="bubble-row user">
+          <div class="bubble user">Estou com febre e dor no peito desde ontem.</div>
+        </div>
+        <div class="bubble-row">
+          <div class="av"><i class="ti ti-robot"></i></div>
+          <div class="bubble ai">Entendido. Você também está sentindo falta de ar ou tosse seca?</div>
+        </div>
+        <div class="bubble-row user">
+          <div class="bubble user">Sim, uma leve falta de ar.</div>
+        </div>
+        <div class="bubble-row">
+          <div class="av"><i class="ti ti-robot"></i></div>
+          <div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+      </div>
+      <div class="chat-input-bar">
+        <div class="chat-input-field">Digite seus sintomas...</div>
+        <div class="send-btn"><i class="ti ti-send"></i></div>
+      </div>
+    </div>
+    <div class="home-bar"></div>
+  </div></div>
+</div>
+
+<!-- ═══════════════════════════ TELA 4 — TRIAGEM ═══════════════════════════ -->
+<div class="stage" id="s3">
+  <p class="screen-label">Tela 4 — Resultado da Triagem</p>
+  <div class="phone-wrap"><div class="phone">
+    <div class="dynamic-island"></div>
+    <div class="status-bar"><span>9:41</span><span><i class="ti ti-wifi"></i></span></div>
+    <div class="screen">
+      <div class="topbar">
+        <div class="back-btn"><i class="ti ti-arrow-left"></i></div>
+        <span class="topbar-title">Resultado da triagem</span>
+      </div>
+      <div class="content">
+        <div class="urgency-bar yellow">
+          <div class="urg-dot yellow"></div>
+          <div>
+            <div class="urg-text-title yellow">Urgência moderada</div>
+            <div class="urg-text-sub">Atendimento em até 2 horas</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-brain"></i> Pré-diagnóstico</div>
+          <div class="card-body">Possível quadro respiratório febril. Os sintomas descritos indicam necessidade de avaliação médica presencial com certa brevidade.</div>
+        </div>
+        <div class="section-label">Recomendações</div>
+        <div class="rec-item"><i class="ti ti-check"></i><span>Evite esforço físico</span></div>
+        <div class="rec-item"><i class="ti ti-check"></i><span>Mantenha-se hidratado</span></div>
+        <div class="rec-item"><i class="ti ti-check"></i><span>Busque atendimento médico</span></div>
+        <button class="btn-primary" style="margin-top:12px"><i class="ti ti-map-pin"></i> Ver hospitais próximos</button>
+      </div>
+    </div>
+    <div class="home-bar"></div>
+  </div></div>
+</div>
+
+<!-- ═══════════════════════════ TELA 5 — HOSPITAIS ═══════════════════════════ -->
+<div class="stage" id="s4">
+  <p class="screen-label">Tela 5 — Hospitais / Clínicas</p>
+  <div class="phone-wrap"><div class="phone">
+    <div class="dynamic-island"></div>
+    <div class="status-bar"><span>9:41</span><span><i class="ti ti-wifi"></i></span></div>
+    <div class="screen">
+      <div class="topbar">
+        <div class="back-btn"><i class="ti ti-arrow-left"></i></div>
+        <span class="topbar-title">Unidades próximas</span>
+        <i class="ti ti-adjustments-horizontal" style="font-size:18px;color:var(--p400)"></i>
+      </div>
+      <div class="content">
+        <div class="mini-map">
+          <i class="ti ti-map-pin-filled"></i>
+        </div>
+        <div class="section-label">Mais recomendados</div>
+        <div class="hosp-card">
+          <div class="hosp-icon"><i class="ti ti-building-hospital"></i></div>
+          <div class="hosp-info">
+            <div class="hosp-name">Hospital Santa Cruz</div>
+            <div class="hosp-meta">
+              <span><i class="ti ti-map-pin"></i> 1,2 km</span>
+              <span><i class="ti ti-clock"></i> ~8 min</span>
+              <span class="stars">★★★★★</span><span>4.7</span>
+            </div>
+          </div>
+          <button class="sel-btn">Selecionar</button>
+        </div>
+        <div class="hosp-card">
+          <div class="hosp-icon"><i class="ti ti-building-hospital"></i></div>
+          <div class="hosp-info">
+            <div class="hosp-name">UPA Centro</div>
+            <div class="hosp-meta">
+              <span><i class="ti ti-map-pin"></i> 2,4 km</span>
+              <span><i class="ti ti-clock"></i> ~12 min</span>
+              <span class="stars">★★★★</span><span>4.3</span>
+            </div>
+          </div>
+          <button class="sel-btn">Selecionar</button>
+        </div>
+        <div class="hosp-card">
+          <div class="hosp-icon"><i class="ti ti-stethoscope"></i></div>
+          <div class="hosp-info">
+            <div class="hosp-name">Clínica Bem Estar</div>
+            <div class="hosp-meta">
+              <span><i class="ti ti-map-pin"></i> 3,1 km</span>
+              <span><i class="ti ti-clock"></i> ~15 min</span>
+              <span class="stars">★★★★½</span><span>4.5</span>
+            </div>
+          </div>
+          <button class="sel-btn">Selecionar</button>
+        </div>
+      </div>
+    </div>
+    <div class="home-bar"></div>
+  </div></div>
+</div>
+
+<!-- ═══════════════════════════ TELA 6 — AGENDAMENTO ═══════════════════════════ -->
+<div class="stage" id="s5">
+  <p class="screen-label">Tela 6 — Agendamento</p>
+  <div class="phone-wrap"><div class="phone">
+    <div class="dynamic-island"></div>
+    <div class="status-bar"><span>9:41</span><span><i class="ti ti-wifi"></i></span></div>
+    <div class="screen">
+      <div class="topbar">
+        <div class="back-btn"><i class="ti ti-arrow-left"></i></div>
+        <span class="topbar-title">Agendar consulta</span>
+      </div>
+      <div class="content">
+        <div style="font-size:11px;color:var(--p600);margin-bottom:12px;display:flex;align-items:center;gap:5px;font-weight:500">
+          <i class="ti ti-building-hospital" style="font-size:14px"></i>
+          Hospital Santa Cruz · Clínica Geral
+        </div>
+        <div class="cal-card">
+          <div class="cal-header">
+            <i class="ti ti-chevron-left cal-nav"></i>
+            <span class="cal-month">Junho 2025</span>
+            <i class="ti ti-chevron-right cal-nav"></i>
+          </div>
+          <div class="cal-days">
+            <div class="cal-day-lbl">D</div><div class="cal-day-lbl">S</div><div class="cal-day-lbl">T</div>
+            <div class="cal-day-lbl">Q</div><div class="cal-day-lbl">Q</div><div class="cal-day-lbl">S</div><div class="cal-day-lbl">S</div>
+          </div>
+          <div class="cal-dates">
+            <div class="cal-date unavail"></div><div class="cal-date unavail"></div><div class="cal-date unavail"></div>
+            <div class="cal-date unavail"></div><div class="cal-date unavail"></div><div class="cal-date unavail"></div><div class="cal-date">1</div>
+            <div class="cal-date">2</div><div class="cal-date">3</div><div class="cal-date">4</div><div class="cal-date">5</div>
+            <div class="cal-date">6</div><div class="cal-date">7</div><div class="cal-date">8</div>
+            <div class="cal-date">9</div><div class="cal-date">10</div><div class="cal-date today">11</div><div class="cal-date">12</div>
+            <div class="cal-date">13</div><div class="cal-date selected">14</div><div class="cal-date">15</div>
+            <div class="cal-date">16</div><div class="cal-date">17</div><div class="cal-date">18</div><div class="cal-date">19</div>
+            <div class="cal-date">20</div><div class="cal-date">21</div><div class="cal-date">22</div>
+            <div class="cal-date">23</div><div class="cal-date">24</div><div class="cal-date">25</div><div class="cal-date">26</div>
+            <div class="cal-date">27</div><div class="cal-date">28</div><div class="cal-date">29</div><div class="cal-date">30</div>
+          </div>
+        </div>
+        <div class="section-label">Horários disponíveis</div>
+        <div class="time-grid">
+          <div class="time-chip">08:00</div>
+          <div class="time-chip selected">09:30</div>
+          <div class="time-chip">11:00</div>
+          <div class="time-chip">13:30</div>
+          <div class="time-chip">15:00</div>
+          <div class="time-chip unavail">16:30</div>
+          <div class="time-chip unavail">17:00</div>
+        </div>
+        <button class="btn-primary"><i class="ti ti-calendar-check"></i> Confirmar consulta</button>
+      </div>
+    </div>
+    <div class="home-bar"></div>
+  </div></div>
+</div>
+
+<!-- ═══════════════════════════ TELA 7 — EMERGÊNCIA ═══════════════════════════ -->
+<div class="stage" id="s6">
+  <p class="screen-label">Tela 7 — Emergência</p>
+  <div class="phone-wrap"><div class="phone">
+    <div class="dynamic-island"></div>
+    <div class="status-bar" style="background:var(--p600);color:rgba(255,255,255,.7)">
+      <span>9:41</span><span><i class="ti ti-wifi"></i></span>
+    </div>
+    <div class="screen" style="background:#f7f6ff">
+      <div class="emg-header">
+        <div class="emg-alert-icon"><i class="ti ti-alert-triangle"></i></div>
+        <div class="emg-title">Emergência detectada</div>
+        <div class="emg-sub">Seus sintomas exigem atendimento imediato</div>
+      </div>
+      <div class="emg-content">
+        <div class="emg-hosp">
+          <div class="emg-hosp-label">Pronto-socorro recomendado</div>
+          <div class="emg-hosp-name">Hospital Santa Cruz</div>
+          <div class="emg-hosp-meta">
+            <span><i class="ti ti-clock"></i> ~8 min</span>
+            <span><i class="ti ti-map-pin"></i> 1,2 km</span>
+          </div>
+        </div>
+        <div class="section-label">Sintomas enviados ao hospital</div>
+        <div style="margin-bottom:14px">
+          <span class="symptom-chip"><i class="ti ti-thermometer"></i> Febre</span>
+          <span class="symptom-chip"><i class="ti ti-heart-rate-monitor"></i> Dor no peito</span>
+          <span class="symptom-chip"><i class="ti ti-wind"></i> Falta de ar</span>
+        </div>
+        <button class="btn-emg-primary"><i class="ti ti-navigation"></i> Iniciar rota</button>
+        <button class="btn-emg-secondary"><i class="ti ti-phone-call"></i> Ligar para emergência</button>
+      </div>
+    </div>
+    <div class="home-bar"></div>
+  </div></div>
+</div>
+
+<footer class="footer">
+  <strong>SPAM</strong> – Sistema de Pré Atendimento Médico<br>
+  Universidade Positivo · Prototipagem de Sistemas Computacionais · Prof.ª Aline Andrade<br>
+  André Tanamati · Luiz Gabriel · Rafael Chiminello · Vinicius Gelasko · Vinicius Vidal
+</footer>
+
+<script>
+  function show(i) {
+    document.querySelectorAll('.stage').forEach((s, j) => s.classList.toggle('show', j === i));
+    document.querySelectorAll('.nav button').forEach((b, j) => b.classList.toggle('active', j === i));
+  }
+</script>
+</body>
+</html>
