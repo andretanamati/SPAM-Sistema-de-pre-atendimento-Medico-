@@ -853,18 +853,40 @@ function saveSaude() {
   showModal('sucesso_saude');
 }
 
-/* ── Chat IA ── */
-const API_URL = 'https://api.anthropic.com/v1/messages';
-let chatHistory = [];
+/* ── Chat IA (simulado) ── */
 let isLoading = false;
+let chatStep = 0;
 
-const SYSTEM_PROMPT = `Você é o assistente de triagem do SPAM (Sistema de Pré-Atendimento Médico). 
-Seu objetivo é coletar informações sobre os sintomas do paciente de forma empática e objetiva.
-Faça perguntas curtas e claras sobre: localização da dor, intensidade (0-10), duração, febre, e outros sintomas associados.
-Após coletar informações suficientes (3-4 trocas), forneça uma avaliação de urgência: LEVE, MODERADA ou ALTA.
-Mantenha respostas curtas (máximo 2 frases). Fale sempre em português brasileiro.`;
+const CHAT_FLOW = [
+  { keywords: [], reply: null }, // step 0 = mensagem inicial já exibida
+  {
+    keywords: ['dor', 'febre', 'cabeça', 'peito', 'barriga', 'costas', 'garganta', 'tosse', 'falta', 'ar', 'náusea', 'enjoo', 'tontura', 'cansaço', 'fraqueza'],
+    reply: 'Entendido. Há quanto tempo você está sentindo esses sintomas? E em uma escala de 0 a 10, como você classificaria a intensidade?'
+  },
+  {
+    keywords: [],
+    reply: 'Você tem apresentado febre? Se sim, consegue estimar a temperatura? E está tomando algum medicamento atualmente?'
+  },
+  {
+    keywords: [],
+    reply: 'Você tem alguma doença crônica como diabetes, hipertensão ou problema cardíaco? Isso é importante para a avaliação.'
+  },
+  {
+    keywords: [],
+    reply: 'Obrigado pelas informações. Com base nos sintomas relatados, identifiquei uma situação de urgência moderada. Recomendo atendimento médico em até 2 horas.',
+    showTriagem: true
+  }
+];
 
-async function sendChat() {
+// Respostas genéricas para quando o usuário digita algo fora do fluxo
+const GENERIC_REPLIES = [
+  'Entendido. Pode me contar mais detalhes sobre quando começou?',
+  'Compreendo. Você sente algum outro sintoma além desse?',
+  'Anotado. Esse sintoma piora em algum momento específico do dia?',
+  'Certo. Você tem histórico de alguma condição de saúde relevante?'
+];
+
+function sendChat() {
   if (isLoading) return;
   const input = document.getElementById('chat-input');
   const msg = input.value.trim();
@@ -872,40 +894,37 @@ async function sendChat() {
 
   input.value = '';
   appendMessage('user', msg);
-  chatHistory.push({ role: 'user', content: msg });
-  showTyping();
   isLoading = true;
+  showTyping();
 
-  try {
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        system: SYSTEM_PROMPT,
-        messages: chatHistory
-      })
-    });
-    const data = await response.json();
+  const delay = 1000 + Math.random() * 800;
+
+  setTimeout(() => {
     hideTyping();
-    const reply = data.content?.[0]?.text || 'Erro ao processar resposta.';
-    appendMessage('ai', reply);
-    chatHistory.push({ role: 'assistant', content: reply });
 
-    // Se mencionar urgência, oferecer ir para triagem
-    if (reply.match(/urgência|moderada|alta|ALTA|MODERADA|resultado|triagem/i) && chatHistory.length >= 6) {
-      setTimeout(() => {
-        appendMessage('ai', 'Com base nos seus sintomas, preparei o resultado da triagem. Deseja visualizar? ➜');
-        appendGoToTriagem();
-      }, 800);
+    let reply;
+    let showTriagem = false;
+
+    if (chatStep < CHAT_FLOW.length - 1) {
+      chatStep++;
+      reply = CHAT_FLOW[chatStep].reply;
+      showTriagem = CHAT_FLOW[chatStep].showTriagem || false;
+    } else {
+      // Após o fluxo principal, respostas genéricas
+      reply = GENERIC_REPLIES[Math.floor(Math.random() * GENERIC_REPLIES.length)];
     }
-  } catch (err) {
-    hideTyping();
-    appendMessage('ai', 'Desculpe, houve um problema na conexão. Por favor, tente novamente.');
-  }
-  isLoading = false;
-  scrollChat();
+
+    appendMessage('ai', reply);
+
+    if (showTriagem) {
+      setTimeout(() => {
+        appendGoToTriagem();
+      }, 600);
+    }
+
+    isLoading = false;
+    scrollChat();
+  }, delay);
 }
 
 function appendMessage(role, text) {
