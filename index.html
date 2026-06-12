@@ -994,7 +994,7 @@ function selectHosp(idx, name) {
 
 /* ── Calendário ── */
 const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-let calYear = 2025, calMonth = 5, calSelected = 14;
+const _now = new Date(); let calYear = _now.getFullYear(), calMonth = _now.getMonth(), calSelected = null;
 
 function renderCal() {
   document.getElementById('cal-month-label').textContent = MONTHS[calMonth] + ' ' + calYear;
